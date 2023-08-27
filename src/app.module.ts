@@ -4,6 +4,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { BlogsModule } from './blogs/blogs.module';
+import { join } from 'path';
+import { User } from './users/entities/users.entity';
 
 @Module({
   imports: [
@@ -14,7 +16,7 @@ import { BlogsModule } from './blogs/blogs.module';
       username: 'testuser',
       password: 'testuser123',
       database: 'nestjs_blog_platform',
-      entities: [__dirname + '/**/*.entity.ts'],
+      entities: [User],
       synchronize: true,
     }),
     UsersModule, BlogsModule],
