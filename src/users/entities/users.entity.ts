@@ -20,4 +20,7 @@ export class User{
 
     @UpdateDateColumn({ type: 'timestamp' })
     updated_at: Date;
+
+    @Column()
+    salt: string;
 }
