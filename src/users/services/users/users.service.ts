@@ -4,13 +4,13 @@ import { User } from 'src/users/entities/users.entity';
 import { CreateUserParams, SignInUserParams } from 'src/users/utils/types';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { JwtModule } from '@nestjs/jwt';
-
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
-        private readonly userRepository:Repository<User>
+        private readonly userRepository:Repository<User>,
+        private jwtService: JwtService,
     ){}
 
     async findAllUsers(): Promise<User[]> {
@@ -61,13 +61,18 @@ export class UsersService {
         
     }
 
-    async signInUser(userDetails: SignInUserParams){
+    async signInUser(userDetails: SignInUserParams) : Promise<{accessToken: string}> {
 
         const username = await this.validateUserPassword({...userDetails});
 
         if(!username){
             throw new BadRequestException('Invalid credentials');
         }
+
+        const payload = {username};
+        const accessToken = await this.jwtService.signAsync(payload);
+
+        return {accessToken};
         
     }
 }

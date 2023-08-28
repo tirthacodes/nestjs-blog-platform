@@ -21,7 +21,7 @@ export class UsersController {
     }
 
     @Post('login')
-    signInUser(@Body() signInDto: SigninUserDto){
+    signInUser(@Body() signInDto: SigninUserDto) : Promise<{accessToken: string}> {
         return this.userService.signInUser(signInDto);
     }
 }
