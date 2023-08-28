@@ -16,15 +16,14 @@ export class UsersService {
         return this.userRepository.find();
     }
 
-    async createUser(userDetails: CreateUserParams) : Promise<User> {
+    async createUser(userDetails: CreateUserParams) : Promise<{message: string}> {
         const salt = await bcrypt.genSalt();
         const hashedPassword = await this.hashPassword(userDetails.password, salt);
 
         const newUser = this.userRepository.create({...userDetails, salt, password: hashedPassword,});
 
         await this.userRepository.save(newUser);
-        return newUser;
-        
+        return {message: 'registration successful!'};        
     }
 
     private async hashPassword(password: string, salt: string) : Promise<string> {
