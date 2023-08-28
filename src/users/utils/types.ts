@@ -3,3 +3,8 @@ export type CreateUserParams = {
     email: string;
     password: string;
 }
+
+export type SignInUserParams = {
+    username: string;
+    password: string;
+}

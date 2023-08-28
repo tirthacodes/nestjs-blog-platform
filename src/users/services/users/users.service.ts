@@ -1,10 +1,10 @@
-import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/users.entity';
-import { CreateUserParams } from 'src/users/utils/types';
+import { CreateUserParams, SignInUserParams } from 'src/users/utils/types';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { error } from 'console';
+import { JwtModule } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
@@ -47,5 +47,27 @@ export class UsersService {
 
     private async hashPassword(password: string, salt: string) {
         return bcrypt.hash(password, salt);
+    }
+
+    private async validateUserPassword(userDetails: SignInUserParams){
+        const user = await this.userRepository.findOne({ where: {username: userDetails.username}});
+
+        if(user && await user.validatePassword(userDetails.password)){
+            return user.username;
+        }
+        else{
+            return null;
+        }
+        
+    }
+
+    async signInUser(userDetails: SignInUserParams){
+
+        const username = await this.validateUserPassword({...userDetails});
+
+        if(!username){
+            throw new BadRequestException('Invalid credentials');
+        }
+        
     }
 }

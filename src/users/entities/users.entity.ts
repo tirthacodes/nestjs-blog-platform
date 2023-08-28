@@ -1,4 +1,5 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import * as bcrypt from 'bcrypt';
 
 @Entity({ name: 'users' })
 export class User{
@@ -23,4 +24,8 @@ export class User{
 
     @Column()
     salt: string;
+
+    async validatePassword(password: string){
+        return bcrypt.compare(password, this.password);
+    }
 }
