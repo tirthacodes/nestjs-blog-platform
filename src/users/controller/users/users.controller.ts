@@ -12,8 +12,8 @@ export class UsersController {
     ){}
 
     @Get()
-    findAllUsers(): Promise<User[]> {
-        return this.userService.findAllUsers();
+    findAllUsers(@Req() request: Request): Promise<User[]> {
+        return this.userService.findAllUsers(request);
     }
 
     @Post('register')

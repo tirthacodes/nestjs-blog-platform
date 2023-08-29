@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/users.entity';
 import { CreateUserParams, SignInUserParams } from 'src/users/utils/types';
@@ -14,8 +14,22 @@ export class UsersService {
         private jwtService: JwtService,
     ){}
 
-    async findAllUsers(): Promise<User[]> {
-        return this.userRepository.find();
+    async findAllUsers(request: Request): Promise<User[]> {
+        try{
+            const cookie = request.cookies['jwt'];
+    
+            const data = await this.jwtService.verifyAsync(cookie);
+
+            if(!data){
+                throw new UnauthorizedException();
+            }
+
+            return this.userRepository.find();
+        }catch(e){
+            throw new UnauthorizedException();
+        }
+
+        
     }
 
     async createUser(userDetails: CreateUserParams)  {
