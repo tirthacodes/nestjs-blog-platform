@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { BlogsModule } from './blogs/blogs.module';
 import { join } from 'path';
 import { User } from './users/entities/users.entity';
+import { CommentsController } from './blogs/comments/comments.controller';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { User } from './users/entities/users.entity';
       synchronize: true,
     }),
     UsersModule, BlogsModule],
-  controllers: [AppController],
+  controllers: [AppController, CommentsController],
   providers: [AppService],
 })
 export class AppModule {}
