@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Get, Post, Body, Res, Req } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { SigninUserDto } from 'src/users/dtos/signin-user.dto';
 import { User } from 'src/users/entities/users.entity';
@@ -12,8 +12,8 @@ export class UsersController {
     ){}
 
     @Get()
-    findAllUsers(): Promise<User[]> {
-        return this.userService.findAllUsers();
+    findAllUsers(@Req() request: Request): Promise<User[]> {
+        return this.userService.findAllUsers(request);
     }
 
     @Post('register')
@@ -23,8 +23,17 @@ export class UsersController {
 
     @Post('login')
     async signInUser(@Body() signInDto: SigninUserDto,
-    @Res({ passthrough: true}) response: Response) : Promise<{message}> {
+    @Res({ passthrough: true}) response: Response) : Promise<{message: any}> {
         const result =  await this.userService.signInUser(signInDto, response);
         return result;
+    }
+
+    @Post('logout')
+    logout(@Res({passthrough:true}) response: Response) : {message: any} {
+        response.clearCookie('jwt');
+
+        return{
+            message: 'logout successfully!'
+        };
     }
 }

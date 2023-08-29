@@ -5,7 +5,7 @@ import { CreateUserParams, SignInUserParams } from 'src/users/utils/types';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 @Injectable()
 export class UsersService {
     constructor(
@@ -14,7 +14,9 @@ export class UsersService {
         private jwtService: JwtService,
     ){}
 
-    async findAllUsers(): Promise<User[]> {
+    async findAllUsers(request: Request): Promise<User[]> {
+        const cookie = request.cookies['jwt'];
+
         return this.userRepository.find();
     }
 
