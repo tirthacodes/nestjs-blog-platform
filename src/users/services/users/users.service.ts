@@ -5,6 +5,7 @@ import { CreateUserParams, SignInUserParams } from 'src/users/utils/types';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 @Injectable()
 export class UsersService {
     constructor(
@@ -61,7 +62,11 @@ export class UsersService {
         
     }
 
-    async signInUser(userDetails: SignInUserParams) : Promise<{accessToken: string}> {
+    private setTokenCookie(response: Response, accessToken: string): void {
+        response.cookie('jwt', accessToken, {httpOnly: true, maxAge: 3600000});
+    }
+
+    async signInUser(userDetails: SignInUserParams, response: Response) : Promise<{message}> {
 
         const username = await this.validateUserPassword({...userDetails});
 
@@ -72,7 +77,11 @@ export class UsersService {
         const payload = {username};
         const accessToken = await this.jwtService.signAsync(payload);
 
-        return {accessToken};
+        this.setTokenCookie(response,accessToken);
+
+        return {
+            message: 'success!'
+        };
         
     }
 }

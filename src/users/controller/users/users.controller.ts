@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { SigninUserDto } from 'src/users/dtos/signin-user.dto';
 import { User } from 'src/users/entities/users.entity';
@@ -21,7 +22,9 @@ export class UsersController {
     }
 
     @Post('login')
-    signInUser(@Body() signInDto: SigninUserDto) : Promise<{accessToken: string}> {
-        return this.userService.signInUser(signInDto);
+    async signInUser(@Body() signInDto: SigninUserDto,
+    @Res({ passthrough: true}) response: Response) : Promise<{message}> {
+        const result =  await this.userService.signInUser(signInDto, response);
+        return result;
     }
 }
