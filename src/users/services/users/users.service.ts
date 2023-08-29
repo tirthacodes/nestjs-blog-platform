@@ -14,9 +14,7 @@ export class UsersService {
         private jwtService: JwtService,
     ){}
 
-    async findAllUsers(request: Request): Promise<User[]> {
-        const cookie = request.cookies['jwt'];
-
+    async findAllUsers(): Promise<User[]> {
         return this.userRepository.find();
     }
 
