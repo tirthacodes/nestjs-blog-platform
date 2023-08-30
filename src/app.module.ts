@@ -7,6 +7,7 @@ import { BlogsModule } from './blogs/blogs.module';
 import { join } from 'path';
 import { User } from './users/entities/users.entity';
 import { CommentsController } from './blogs/comments/comments.controller';
+import { Blog } from './blogs/blog.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { CommentsController } from './blogs/comments/comments.controller';
       username: 'testuser',
       password: 'testuser123',
       database: 'nestjs_blog_platform',
-      entities: [User],
+      entities: [User, Blog],
       synchronize: true,
     }),
     UsersModule, BlogsModule],

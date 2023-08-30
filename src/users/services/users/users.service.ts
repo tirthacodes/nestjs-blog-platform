@@ -95,7 +95,7 @@ export class UsersService {
 
         return {
             message: 'success!'
-        };
+        }; 
         
     }
 }

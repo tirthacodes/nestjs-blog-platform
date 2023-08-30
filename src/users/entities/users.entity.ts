@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
+import { Blog } from "src/blogs/blog.entity";
 
 @Entity({ name: 'users' })
 export class User{
@@ -28,4 +29,7 @@ export class User{
     async validatePassword(password: string){
         return bcrypt.compare(password, this.password);
     }
+
+    @OneToMany(() => Blog, (blog) => blog.user)
+    blogs: Blog[];
 }
