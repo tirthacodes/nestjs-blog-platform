@@ -1,4 +1,5 @@
-import { Controller, Post, Get, Patch, Delete } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body } from '@nestjs/common';
+import { CreateBlogDto } from 'src/blogs/dtos/create-blog.dto';
 import { BlogsService } from 'src/blogs/services/blogs/blogs.service';
 
 @Controller('blogs')
@@ -9,8 +10,8 @@ export class BlogsController {
     ){}
 
     @Post('create')
-    createBlog(){
-
+    createBlog(@Body() createBlogDto: CreateBlogDto){
+        return this.blogService.createBlog(createBlogDto);
     }
 
     @Get()
