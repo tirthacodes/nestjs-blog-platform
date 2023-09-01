@@ -16,10 +16,11 @@ export class BlogsService {
 
     async createBlog(request: Request,userDetails: CreateBlogParams){
         const cookie = request.cookies.jwt;
-        const data = await this.jwtService.verifyAsync(cookie);
+        //const data = await this.jwtService.verifyAsync(cookie);
 
 
-        return data;
+        const ran : any = this.jwtService.decode(cookie);
+        return ran.username;
 
         // const newUser = this.blogRepository.create({...userDetails});
 

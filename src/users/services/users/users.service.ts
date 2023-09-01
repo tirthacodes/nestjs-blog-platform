@@ -68,7 +68,7 @@ export class UsersService {
         const user = await this.userRepository.findOne({ where: {username: userDetails.username}});
 
         if(user && await user.validatePassword(userDetails.password)){
-            return user.username;
+            return user;
         }
         else{
             return null;
@@ -82,13 +82,13 @@ export class UsersService {
 
     async signInUser(userDetails: SignInUserParams, response: Response) : Promise<{message}> {
 
-        const username = await this.validateUserPassword({...userDetails});
+        const user = await this.validateUserPassword({...userDetails});
 
-        if(!username){
+        if(!user){
             throw new BadRequestException('Invalid credentials');
         }
 
-        const payload = {username};
+        const payload = {sub: user.id, username: user.username};
         const accessToken = await this.jwtService.signAsync(payload);
 
         this.setTokenCookie(response,accessToken);
