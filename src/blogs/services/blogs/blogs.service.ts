@@ -4,19 +4,22 @@ import { Request } from 'express';
 import { Blog } from 'src/blogs/blog.entity';
 import { CreateBlogParams } from 'src/blogs/blog.types';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class BlogsService {
     constructor(
         @InjectRepository(Blog)
-        private readonly blogRepository: Repository<Blog>
+        private readonly blogRepository: Repository<Blog>,
+        private jwtService: JwtService
     ){}
 
     async createBlog(request: Request,userDetails: CreateBlogParams){
         const cookie = request.cookies.jwt;
+        const data = await this.jwtService.verifyAsync(cookie);
 
 
-        return cookie;
+        return data;
 
         // const newUser = this.blogRepository.create({...userDetails});
 
