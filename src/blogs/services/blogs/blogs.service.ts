@@ -14,10 +14,19 @@ export class BlogsService {
         private jwtService: JwtService
     ){}
 
+    async test(request: Request){
+        const cookie = request.cookies.jwt;
+        const data = await this.jwtService.verifyAsync(cookie);
+
+        const userId = data.sub;
+        return userId;
+    }
+
     async createBlog(request: Request,userDetails: CreateBlogParams){
         const cookie = request.cookies.jwt;
         const data = await this.jwtService.verifyAsync(cookie);
 
+        
         return data.sub;
 
         // const newUser = this.blogRepository.create({...userDetails});

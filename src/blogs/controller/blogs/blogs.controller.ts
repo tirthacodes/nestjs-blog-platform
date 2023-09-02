@@ -12,9 +12,12 @@ export class BlogsController {
 
     @Post('create')
     async createBlog(@Req() request: Request ,@Body() createBlogDto: CreateBlogDto){       
-
-
         return this.blogService.createBlog(request,createBlogDto);
+    }
+
+    @Get('test')
+    async test(@Req() request : Request){
+        return this.blogService.test(request);
     }
 
     @Get()
