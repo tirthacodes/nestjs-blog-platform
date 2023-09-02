@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { Blog } from 'src/blogs/blog.entity';
@@ -14,31 +14,34 @@ export class BlogsService {
         private jwtService: JwtService
     ){}
 
-    async test(request: Request){
-        const cookie = request.cookies.jwt;
-        const data = await this.jwtService.verifyAsync(cookie);
-
-        const userId = data.sub;
-        return userId;
+    private getUserIdfromToken(token: string){
+        try{
+            const data = this.jwtService.verify(token);
+            return data.sub;
+        }
+        catch(error){
+            throw new UnauthorizedException('Invalid Token');
+        }
     }
 
-    async createBlog(request: Request,userDetails: CreateBlogParams){
-        const cookie = request.cookies.jwt;
-        const data = await this.jwtService.verifyAsync(cookie);
+    async createBlog(token: string,userDetails: CreateBlogParams){
+        const userId = this.getUserIdfromToken(token)
 
-        
-        return data.sub;
+        const newBlog = this.blogRepository.create({
+            title: userDetails.title,
+            content: userDetails.content,
+            user: userId,
+        });
 
-        // const newUser = this.blogRepository.create({...userDetails});
-
-        // try{
-        //     this.blogRepository.save(newUser);
-        //     return{
-        //         message: "blog created success!"
-        //     }
-        // }
-        // catch(e){
-        //     return new InternalServerErrorException();
-        // }
+        try{
+            const savedBlog = this.blogRepository.save(newBlog);
+            return savedBlog;
+            // return{
+            //     message: "blog created success!"
+            // }
+        }
+        catch(e){
+            return new InternalServerErrorException('Failed to create new blog');
+        }
     }
 }
