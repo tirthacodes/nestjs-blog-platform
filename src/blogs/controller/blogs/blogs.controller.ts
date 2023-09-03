@@ -17,10 +17,15 @@ export class BlogsController {
         return this.blogService.createBlog(token,createBlogDto);
     }
 
-    @Get()
-    getBlogs(@Req() request: Request) : Promise<Blog[]> {
+    @Get('myblogs')
+    getMyBlogs(@Req() request: Request) : Promise<Blog[]> {
         const token = request.cookies.jwt;
-        return this.blogService.getBlogs(token);
+        return this.blogService.getMyBlogs(token);
+    }
+
+    @Get('')
+    getBlogs(){
+        return this.blogService.getBlogs();
     }
 
     @Get(':id')
