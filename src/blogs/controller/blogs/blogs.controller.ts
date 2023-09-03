@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Body, Req } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Req, Param, ParseIntPipe } from '@nestjs/common';
 import { Request } from 'express';
 import { Blog } from 'src/blogs/blog.entity';
 import { CreateBlogDto } from 'src/blogs/dtos/create-blog.dto';
@@ -29,8 +29,8 @@ export class BlogsController {
     }
 
     @Get(':id')
-    getBlogById(){
-
+    getBlogById(@Param('id', ParseIntPipe) id: number): Promise<Blog> {
+        return this.blogService.getBlogById(id);
     }
 
     @Patch('update/:id')

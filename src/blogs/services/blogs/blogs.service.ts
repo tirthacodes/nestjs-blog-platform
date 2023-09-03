@@ -55,4 +55,8 @@ export class BlogsService {
     async getBlogs(){
         return this.blogRepository.find();
     }
+
+    async getBlogById(id : number) : Promise<Blog> {
+        return this.blogRepository.findOneBy({ id });
+    }
 }

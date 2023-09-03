@@ -6,7 +6,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 export class Blog{
 
     @PrimaryGeneratedColumn()
-    id: string;
+    id: number;
 
     @Column()
     @IsNotEmpty()
