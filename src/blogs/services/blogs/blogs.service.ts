@@ -43,4 +43,12 @@ export class BlogsService {
             return new InternalServerErrorException('Failed to create new blog');
         }
     }
+
+    async getBlogs(token: string): Promise<Blog[]> {
+        const userId = this.getUserIdfromToken(token);
+        return this.blogRepository.
+        createQueryBuilder('blog')
+        .where('blog.user.id = :userId', { userId })
+        .getMany();
+    }
 }

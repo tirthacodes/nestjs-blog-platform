@@ -1,5 +1,6 @@
 import { Controller, Post, Get, Patch, Delete, Body, Req } from '@nestjs/common';
 import { Request } from 'express';
+import { Blog } from 'src/blogs/blog.entity';
 import { CreateBlogDto } from 'src/blogs/dtos/create-blog.dto';
 import { BlogsService } from 'src/blogs/services/blogs/blogs.service';
 
@@ -17,8 +18,9 @@ export class BlogsController {
     }
 
     @Get()
-    getBlogs(){
-
+    getBlogs(@Req() request: Request) : Promise<Blog[]> {
+        const token = request.cookies.jwt;
+        return this.blogService.getBlogs(token);
     }
 
     @Get(':id')
