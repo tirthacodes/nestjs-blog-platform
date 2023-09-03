@@ -17,7 +17,7 @@ export class BlogsController {
     }
 
     @Get()
-    getAllBlogs(){
+    getBlogs(){
 
     }
 

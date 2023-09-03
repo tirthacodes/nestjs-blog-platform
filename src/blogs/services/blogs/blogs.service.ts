@@ -34,11 +34,10 @@ export class BlogsService {
         });
 
         try{
-            const savedBlog = this.blogRepository.save(newBlog);
-            return savedBlog;
-            // return{
-            //     message: "blog created success!"
-            // }
+            await this.blogRepository.save(newBlog);
+            return{
+                message: "blog created success!"
+            }
         }
         catch(e){
             return new InternalServerErrorException('Failed to create new blog');
