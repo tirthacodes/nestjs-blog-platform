@@ -17,7 +17,7 @@ export class BlogsController {
         return this.blogService.createBlog(token,createBlogDto);
     }
 
-    @Get('myblogs')
+    @Get('self')
     getMyBlogs(@Req() request: Request) : Promise<Blog[]> {
         const token = request.cookies.jwt;
         return this.blogService.getMyBlogs(token);

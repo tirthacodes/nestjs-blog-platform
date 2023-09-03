@@ -46,10 +46,10 @@ export class BlogsService {
 
     async getMyBlogs(token: string): Promise<Blog[]> {
         const userId = this.getUserIdfromToken(token);
-        return this.blogRepository.
-        createQueryBuilder('blog')
-        .where('blog.user.id = :userId', { userId })
-        .getMany();
+        return this.blogRepository.find({where: {user: {id : userId}}});
+        // createQueryBuilder('blog')
+        // .where('blog.user.id = :userId', { userId })
+        // .getMany();
     }
 
     async getBlogs(){
