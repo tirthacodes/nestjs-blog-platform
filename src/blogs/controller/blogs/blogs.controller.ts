@@ -30,7 +30,7 @@ export class BlogsController {
     }
 
     @Get(':id')
-    getBlogById(@Param('id', ParseIntPipe) id: number): Promise<Blog> {
+    getBlogById(@Param('id', ParseIntPipe) id: number): Promise<Blog | undefined> {
         return this.blogService.getBlogById(id);
     }
 
@@ -41,7 +41,8 @@ export class BlogsController {
     }
 
     @Delete('delete/:id')
-    deleteBlog(){
-
+    deleteBlog(@Param('id', ParseIntPipe) id: number, @Req() request: Request){
+        const token = request.cookies.jwt;
+        return this.blogService.deleteBlog(id, token);
     }
 }

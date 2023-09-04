@@ -56,7 +56,7 @@ export class BlogsService {
         return this.blogRepository.find();
     }
 
-    async getBlogById(id : number) : Promise<Blog> {
+    async getBlogById(id : number) : Promise<Blog | undefined> {
         return this.blogRepository.findOneBy({ id });
     }
 
@@ -75,6 +75,28 @@ export class BlogsService {
 
         this.blogRepository.update({id},{...updateBlogDetails});
         return this.getBlogById(id);   
+    }
+
+    async deleteBlog(id: number, token: string){
+        const userId = this.getUserIdfromToken(token);
+
+        const blog = await this.blogRepository.findOne({where:{ id: id}, relations: ['user']});
+
+
+        //blog exist?
+        if (!blog) {
+            throw new NotFoundException('Blog not found');
+        }
+
+        //ownership?
+        if (blog.user.id !== userId) {
+            throw new ForbiddenException('You do not have permission to delete this blog');
+        }
+
+        this.blogRepository.delete({ id: id });
+        return{
+            message: `blog with id ${id} deleted successfully`
+        };
     }
 
 }
