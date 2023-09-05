@@ -1,16 +1,22 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, ParseIntPipe, Param, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { CreateCommentDto } from './comments-dto/create-comment.dto';
 import { CommentsService } from './comments.service';
 
-@Controller('comments')
+@Controller('blogs')
 export class CommentsController {
     constructor(
         private readonly commentService : CommentsService
     ){}
 
-    @Post('create')
-    createComment(@Body() createCommentDto: CreateCommentDto){
-        const result = this.commentService.createComment(createCommentDto);
+    @Post(':blogId/createComment')
+    createComment(
+        @Param('blogId', ParseIntPipe) blogId: number,
+        @Body() createCommentDto: CreateCommentDto,
+        @Req() request: Request
+    ){
+        const token = request.cookies.jwt;
+        const result = this.commentService.createComment(blogId, token, createCommentDto);
         return result;
     }
 }
