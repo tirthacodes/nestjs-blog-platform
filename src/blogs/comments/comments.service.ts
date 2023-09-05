@@ -11,7 +11,12 @@ export class CommentsService {
         private readonly commentRepo : Repository<Comment>
     ){}
 
-    createComment(commentDetails: CreateCommentDto){
-        
+    async createComment(commentDetails: CreateCommentDto){
+        const newComment = this.commentRepo.create({
+            content: commentDetails.content,
+        });
+
+        await this.commentRepo.save(newComment);
+        return newComment;
     }
 }
