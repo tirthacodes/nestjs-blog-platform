@@ -25,6 +25,12 @@ export class CommentsService {
         }
     }
 
+    async comments(blogId: number, token: string){
+        const userId = await this.getUserIdfromToken(token);
+        const comments = this.commentRepo.find({where: { blog: {id:blogId}}, relations: ['blog'] });
+        return comments;
+    }
+
     async createComment(blogId: number, token: string, commentDetails: CreateCommentParams){
         const userId = this.getUserIdfromToken(token);
 
