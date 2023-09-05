@@ -8,6 +8,8 @@ import { join } from 'path';
 import { User } from './users/entities/users.entity';
 import { CommentsController } from './blogs/comments/comments.controller';
 import { Blog } from './blogs/blog.entity';
+import { Comment } from './blogs/comments/comments-entities/comment.entity';
+import { CommentsModule } from './blogs/comments/comments.module';
 
 @Module({
   imports: [
@@ -18,11 +20,14 @@ import { Blog } from './blogs/blog.entity';
       username: 'testuser',
       password: 'testuser123',
       database: 'nestjs_blog_platform',
-      entities: [User, Blog],
+      entities: [User, Blog, Comment],
       synchronize: true,
     }),
-    UsersModule, BlogsModule],
-  controllers: [AppController, CommentsController],
+    UsersModule,
+    BlogsModule,
+    CommentsModule,
+  ],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
