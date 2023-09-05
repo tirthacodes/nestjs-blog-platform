@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Blog } from "src/blogs/blog.entity";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'comments' })
 export class Comment{
@@ -10,5 +11,8 @@ export class Comment{
 
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date;
+
+    @ManyToOne(() => Blog, (blog) => blog.comments)
+    blog: Blog;
 
 }

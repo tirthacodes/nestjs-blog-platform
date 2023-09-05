@@ -1,6 +1,7 @@
 import { IsNotEmpty } from "class-validator";
 import { User } from "src/users/entities/users.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Comment } from "./comments/comments-entities/comment.entity";
 
 @Entity({ name: 'blogs' })
 export class Blog{
@@ -25,4 +26,7 @@ export class Blog{
     @ManyToOne(()=> User, (user) => user.blogs)
     @JoinColumn({ name: 'user_id'})
     user: User;
+
+    @OneToMany(() => Comment, (comment) => comment.blog)
+    comments: Comment[];
 }
