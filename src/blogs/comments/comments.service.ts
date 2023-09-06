@@ -87,7 +87,6 @@ export class CommentsService {
                 throw new NotFoundException(`Comment not found`);
             }
 
-            console.log('1');
             if (comment.user.id === userId || comment.blog.user.id == userId) {
                 // If authorized, delete the comment
                 await this.commentRepo.delete(commentId);
