@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateCommentParams } from './comment.types';
 import { JwtService } from '@nestjs/jwt';
 import { Blog } from '../blog.entity';
+import { error } from 'console';
 
 @Injectable()
 export class CommentsService {
@@ -53,7 +54,28 @@ export class CommentsService {
         }
         catch(e){
             throw new NotFoundException('Blog not found');
+        }    
+    }
+
+    async deleteComment(blogId: number, token: string, commentId: number){
+        const userId = this.getUserIdfromToken(token);
+
+        const comment = await this.commentRepo.findOne({ where: { id: commentId }, relations: ['user', 'blog', 'blog.user'] });
+        console.log(comment);
+
+        if (!comment) {
+            throw new NotFoundException('Comment not found');
         }
-        
+
+        if (comment.user.id === userId || comment.blog.user.id == userId) {
+            // If authorized, delete the comment
+            await this.commentRepo.delete(commentId);
+            return{
+            message: 'comment deleteddd'
+        };
+        }
+        else{
+            throw new UnauthorizedException('You are not authorized to delete this comment');
+        } 
     }
 }

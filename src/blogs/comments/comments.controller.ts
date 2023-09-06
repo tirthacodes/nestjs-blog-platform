@@ -1,4 +1,4 @@
-import { Body, Controller, Post, ParseIntPipe, Param, Req, Get } from '@nestjs/common';
+import { Body, Controller, Post, ParseIntPipe, Param, Req, Get, Delete } from '@nestjs/common';
 import { Request } from 'express';
 import { CreateCommentDto } from './comments-dto/create-comment.dto';
 import { CommentsService } from './comments.service';
@@ -28,5 +28,15 @@ export class CommentsController {
         const token = request.cookies.jwt;
         const result = this.commentService.createComment(blogId, token, createCommentDto);
         return result;
+    }
+
+    @Delete(':blogId/deletecomment/:cid')
+    deleteComment(
+        @Param('blogId', ParseIntPipe) blogId: number,
+        @Param('cid', ParseIntPipe) cid: number,
+        @Req() request: Request
+    ){
+        const token = request.cookies.jwt;
+        return this.commentService.deleteComment(blogId, token, cid);
     }
 }
