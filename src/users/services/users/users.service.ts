@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
+
 @Injectable()
 export class UsersService {
     constructor(
@@ -17,25 +18,23 @@ export class UsersService {
     async findAllUsers(request: Request): Promise<User[]> {
         try{
             const cookie = request.cookies['jwt'];
-    
+            if (!cookie) {
+                throw new UnauthorizedException('JWT token not provided in the cookie.');
+              }
+          
             const data = await this.jwtService.verifyAsync(cookie);
 
             if(!data){
-                throw new UnauthorizedException();
+                throw new UnauthorizedException('Invalid or expired JWT token.');
             }
 
             return this.userRepository.find();
         }catch(e){
-            throw new UnauthorizedException();
+            throw new UnauthorizedException('Authentication error occurred.');
         } 
     }
 
     async createUser(userDetails: CreateUserParams)  {
-        // const existingUser = await this.userRepository.findOne({where: {username: userDetails.username}});
-
-        // if(existingUser){
-        //     return('Username is already taken!');
-        // }
 
         const salt = await bcrypt.genSalt();
         const hashedPassword = await this.hashPassword(userDetails.password, salt);
@@ -52,10 +51,9 @@ export class UsersService {
                 throw new ConflictException('Username already exists!');
             }
             else{
-                throw new InternalServerErrorException();
+                throw new InternalServerErrorException('Registration failed. Please try again later.');
             }
-        }
-                
+        }        
     }
 
     private async hashPassword(password: string, salt: string) {
@@ -83,7 +81,7 @@ export class UsersService {
         const user = await this.validateUserPassword({...userDetails});
 
         if(!user){
-            throw new BadRequestException('Invalid credentials');
+            throw new BadRequestException('Invalid username or password!');
         }
 
         const payload = {sub: user.id, username: user.username};
@@ -92,8 +90,21 @@ export class UsersService {
         this.setTokenCookie(response,accessToken);
 
         return {
-            message: 'success!'
-        }; 
-        
+            message: 'Login Successful!'
+        };    
     }
+
+    async signOutUser(token: string, response: Response) : Promise<any> {
+
+        if(!token){
+            throw new BadRequestException('No JWT token found in cookies.');
+        }
+
+        response.clearCookie('jwt');
+
+        return{
+            message: 'Logout Successfully!'
+        };
+    }
+
 }

@@ -29,11 +29,9 @@ export class UsersController {
     }
 
     @Post('logout')
-    logout(@Res({passthrough:true}) response: Response) : {message: any} {
-        response.clearCookie('jwt');
-
-        return{
-            message: 'logout successfully!'
-        };
+    logout(@Res({passthrough:true}) response: Response, @Req() request: Request) : Promise<any> {
+        const token = request.cookies.jwt;
+        return this.userService.signOutUser(token, response);
+        
     }
 }
