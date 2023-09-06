@@ -5,6 +5,7 @@ import { Blog } from 'src/blogs/blog.entity';
 import { CreateBlogParams, UpdateBlogParams } from 'src/blogs/blog.types';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { UpdateBlogDto } from 'src/blogs/dtos/update-blog.dto';
 
 @Injectable()
 export class BlogsService {
@@ -24,7 +25,7 @@ export class BlogsService {
         }
     }
 
-    async createBlog(token: string,userDetails: CreateBlogParams){
+    async createBlog(token: string,userDetails: CreateBlogParams) : Promise<{message: string}> {
         const userId = this.getUserIdfromToken(token)
 
         const newBlog = this.blogRepository.create({
@@ -36,7 +37,7 @@ export class BlogsService {
         try{
             await this.blogRepository.save(newBlog);
             return{
-                message: "blog created success!"
+                message: "Blog created successfully!"
             }
         }
         catch(e){
@@ -52,15 +53,20 @@ export class BlogsService {
         // .getMany();
     }
 
-    async getBlogs(){
+    async getBlogs() : Promise<Blog[]> {
         return this.blogRepository.find();
     }
 
     async getBlogById(id : number) : Promise<Blog | undefined> {
-        return this.blogRepository.findOneBy({ id });
+        const blog = await this.blogRepository.findOneBy({ id });
+
+        if(!blog){
+            throw new NotFoundException('Blog Not Found.');
+        }
+        return blog;
     }
 
-    async updateBlog(id: number, token: string, updateBlogDetails: UpdateBlogParams){
+    async updateBlog(id: number, token: string, updateBlogDetails: UpdateBlogParams) : Promise<{ blog: UpdateBlogParams, message: string }>{
 
         const userId = this.getUserIdfromToken(token);
         const blog = await this.blogRepository.findOne({where:{ id: id}, relations: ['user']});
@@ -73,29 +79,37 @@ export class BlogsService {
             throw new ForbiddenException('You do not have permission to update this blog');
         }
 
-        this.blogRepository.update({id},{...updateBlogDetails});
-        return this.getBlogById(id);   
+        blog.title = updateBlogDetails.title;
+        blog.content = updateBlogDetails.content;
+
+        await this.blogRepository.save(blog);
+
+        const updatedBlog: UpdateBlogParams = {
+            title: blog.title,
+            content: blog.content,
+        };
+        return { blog: updatedBlog, message: 'Blog updated successfully!' };
     }
 
-    async deleteBlog(id: number, token: string){
+    async deleteBlog(id: number, token: string) : Promise<{message: string}> {
         const userId = this.getUserIdfromToken(token);
 
         const blog = await this.blogRepository.findOne({where:{ id: id}, relations: ['user']});
 
-
         //blog exist?
         if (!blog) {
-            throw new NotFoundException('Blog not found');
+            throw new NotFoundException('Blog not found.');
         }
 
         //ownership?
         if (blog.user.id !== userId) {
-            throw new ForbiddenException('You do not have permission to delete this blog');
+            throw new ForbiddenException('You do not have permission to delete this blog.');
         }
 
         this.blogRepository.delete({ id: id });
+
         return{
-            message: `blog with id ${id} deleted successfully`
+            message: `Blog with title '${blog.title}' deleted!`
         };
     }
 

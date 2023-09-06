@@ -1,6 +1,7 @@
 import { Controller, Post, Get, Patch, Delete, Body, Req, Param, ParseIntPipe } from '@nestjs/common';
 import { Request } from 'express';
 import { Blog } from 'src/blogs/blog.entity';
+import { UpdateBlogParams } from 'src/blogs/blog.types';
 import { CreateBlogDto } from 'src/blogs/dtos/create-blog.dto';
 import { UpdateBlogDto } from 'src/blogs/dtos/update-blog.dto';
 import { BlogsService } from 'src/blogs/services/blogs/blogs.service';
@@ -13,7 +14,7 @@ export class BlogsController {
     ){}
 
     @Post('create')
-    async createBlog(@Req() request: Request ,@Body() createBlogDto: CreateBlogDto){
+    async createBlog(@Req() request: Request ,@Body() createBlogDto: CreateBlogDto) : Promise<{message: string}> {
         const token = request.cookies.jwt;   
         return this.blogService.createBlog(token,createBlogDto);
     }
@@ -25,7 +26,7 @@ export class BlogsController {
     }
 
     @Get('')
-    getBlogs(){
+    getBlogs() : Promise<Blog[]> {
         return this.blogService.getBlogs();
     }
 
@@ -35,7 +36,7 @@ export class BlogsController {
     }
 
     @Patch('update/:id')
-    updateBlog(@Param('id', ParseIntPipe) id: number, @Req() request: Request, @Body() updateBlogDto: UpdateBlogDto){
+    updateBlog(@Param('id', ParseIntPipe) id: number, @Req() request: Request, @Body() updateBlogDto: UpdateBlogDto) : Promise<{ blog: UpdateBlogParams, message: string }>{
         const token = request.cookies.jwt;
         return this.blogService.updateBlog(id, token, updateBlogDto);
     }
