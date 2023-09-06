@@ -1,3 +1,3 @@
 export type CreateCommentParams = {
-    content: string;
+    text: string;
 }

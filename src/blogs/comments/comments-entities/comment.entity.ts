@@ -8,7 +8,7 @@ export class Comment{
     id: number;
 
     @Column()
-    content: string;
+    text: string;
 
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date;

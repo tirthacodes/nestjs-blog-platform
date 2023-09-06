@@ -1,11 +1,9 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './comments-entities/comment.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateCommentParams } from './comment.types';
 import { JwtService } from '@nestjs/jwt';
-import { Blog } from '../blog.entity';
-import { error } from 'console';
 
 @Injectable()
 export class CommentsService {
@@ -27,55 +25,90 @@ export class CommentsService {
     }
 
     async comments(blogId: number, token: string){
-        const userId = await this.getUserIdfromToken(token);
-        const comments = this.commentRepo.find({where: { blog: {id:blogId}}, relations: ['blog'] });
-        return comments;
+        try{
+            await this.getUserIdfromToken(token);
+            const comments = this.commentRepo.find({where: { blog: {id:blogId}}, relations: ['blog'] });
+            return comments;
+        }
+        catch(error){
+            if (error instanceof UnauthorizedException) {
+                throw error; // Re-throw the UnauthorizedException
+            } else {
+                throw new InternalServerErrorException('An error occurred while fetching comments.');
+            }
+        }
     }
 
     async createComment(blogId: number, token: string, commentDetails: CreateCommentParams){
-        const userId = this.getUserIdfromToken(token);
-
-        const blog = await this.commentRepo.find({where: {id: blogId}, relations: ['blog']});
-
-        //const blog = await this.commentRepo.findOne({where: {id: blogId}, });
         try{
+            const userId = this.getUserIdfromToken(token);
+
+            const blog = await this.commentRepo.findOne({ where: {blog: { id: blogId }}, relations: ['blog'] });
+
             if (!blog) {
-                throw new NotFoundException('Blog not found');
-              }
-    
+                throw new NotFoundException('Blog not found.');
+            }
+
             const newComment = this.commentRepo.create({
                 ...commentDetails,
                 user: {id: userId},
                 blog: {id: blogId},
             });
-    
+
             await this.commentRepo.save(newComment);
-            return newComment;
+        
+            return {
+                content: newComment.text,
+                message: "Comment created successfully!",
+            };   
         }
-        catch(e){
-            throw new NotFoundException('Blog not found');
+        catch(error){
+            if(error instanceof UnauthorizedException){
+                throw error;
+            }
+            else{
+                throw new InternalServerErrorException('Failed to comment!')
+            }
         }    
     }
 
     async deleteComment(blogId: number, token: string, commentId: number){
-        const userId = this.getUserIdfromToken(token);
+        try{
+            const userId = this.getUserIdfromToken(token);
+            const blog = await this.commentRepo.findOne({ where: {blog: { id: blogId }}, relations: ['blog'] });
 
-        const comment = await this.commentRepo.findOne({ where: { id: commentId }, relations: ['user', 'blog', 'blog.user'] });
-        console.log(comment);
+            if (!blog) {
+                throw new NotFoundException(`Blog not found.`);
+            }
 
-        if (!comment) {
-            throw new NotFoundException('Comment not found');
+            const comment = await this.commentRepo.findOne({ where: { id: commentId }, relations: ['user', 'blog', 'blog.user'] });
+
+            if (!comment) {
+                throw new NotFoundException(`Comment not found`);
+            }
+
+            console.log('1');
+            if (comment.user.id === userId || comment.blog.user.id == userId) {
+                // If authorized, delete the comment
+                await this.commentRepo.delete(commentId);
+                return{
+                message: 'Comment deleted!'
+            };
+            }
+            else{
+                throw new UnauthorizedException('You are not authorized to delete this comment');
+            }   
         }
-
-        if (comment.user.id === userId || comment.blog.user.id == userId) {
-            // If authorized, delete the comment
-            await this.commentRepo.delete(commentId);
-            return{
-            message: 'comment deleteddd'
-        };
+        catch(error){
+            if(error instanceof NotFoundException){
+                throw error;
+            }
+            else if(error instanceof UnauthorizedException){
+                throw error;
+            }
+            else{
+                throw new InternalServerErrorException('An error occurred while processing your request.');
+            }
         }
-        else{
-            throw new UnauthorizedException('You are not authorized to delete this comment');
-        } 
     }
 }
