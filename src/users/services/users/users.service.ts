@@ -15,6 +15,11 @@ export class UsersService {
         private jwtService: JwtService,
     ){}
 
+    /**
+     * Get all users.
+     * @param request -The HTTP request object.
+     * @returns A list of user objects.
+     */
     async findAllUsers(request: Request): Promise<User[]> {
         try{
             const cookie = request.cookies['jwt'];
@@ -34,6 +39,11 @@ export class UsersService {
         } 
     }
 
+    /**
+     * Create a new user.
+     * @param userDetails - The user details for registration.
+     * @returns A success message or an error
+     */
     async createUser(userDetails: CreateUserParams)  {
 
         const salt = await bcrypt.genSalt();
@@ -76,6 +86,13 @@ export class UsersService {
         response.cookie('jwt', accessToken, {httpOnly: true, maxAge: 3600000});
     }
 
+    /**
+     * ign in a user with the provided credentials and issue a JWT token upon successful authentication.
+     * @param userDetails - The user's sign-in credentials.
+     * @param response - The HTTP response object. 
+     * @returns An object containing a success message.
+     * @throws BadRequestException if the provided credentials are invalid.
+     */
     async signInUser(userDetails: SignInUserParams, response: Response) : Promise<{message}> {
 
         const user = await this.validateUserPassword({...userDetails});
@@ -94,6 +111,12 @@ export class UsersService {
         };    
     }
 
+    /**
+     * Sign out a user by clearing the JWT token.
+     * @param token - The JWT token.
+     * @param response The HTTP response object.
+     * @returns A success message.
+     */
     async signOutUser(token: string, response: Response) : Promise<any> {
 
         if(!token){
