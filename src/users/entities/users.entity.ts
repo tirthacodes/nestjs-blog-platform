@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Up
 import * as bcrypt from 'bcrypt';
 import { Blog } from "src/blogs/blog.entity";
 import { Comment } from "src/blogs/comments/comments-entities/comment.entity";
+import { Exclude } from "class-transformer";
 
 @Entity({ name: 'users' })
 export class User{
@@ -16,6 +17,7 @@ export class User{
     email: string;
 
     @Column()
+    @Exclude()
     password: string;
 
     @CreateDateColumn({ type: 'timestamp' })
@@ -25,6 +27,7 @@ export class User{
     updated_at: Date;
 
     @Column()
+    @Exclude()
     salt: string;
 
     async validatePassword(password: string){

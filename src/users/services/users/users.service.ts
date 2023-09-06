@@ -27,9 +27,7 @@ export class UsersService {
             return this.userRepository.find();
         }catch(e){
             throw new UnauthorizedException();
-        }
-
-        
+        } 
     }
 
     async createUser(userDetails: CreateUserParams)  {
