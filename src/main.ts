@@ -2,6 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from "cookie-parser";
 import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 
 async function bootstrap() {
@@ -15,6 +16,15 @@ async function bootstrap() {
     origin: 'http://localhost:3000',
     credentials: true
   })
+
+  const config = new DocumentBuilder()
+    .setTitle('NestJs Blog Platform')
+    .setDescription('A RESTful API for managing blog posts and comments. Allows users to create, read, update, and delete blog posts and comments. Supports user authentication for managing their own content. Returns data in JSON format.')
+    .setVersion('1.0.0')
+    .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document);
 
   await app.listen(3000);
 }
