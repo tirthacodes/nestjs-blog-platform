@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blog Platform</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+
+    header {
+      background-color: #1e3a8a;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .nav-buttons button {
+      background-color: #3b82f6;
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      margin-left: 0.75rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .nav-buttons button:hover {
+      background-color: #2563eb;
+    }
+
+    main {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .blog-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .blog-card {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+      transition: transform 0.2s ease;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .blog-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #1e3a8a;
+    }
+
+    .blog-author {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+
+    .blog-content {
+      font-size: 1rem;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .more-btn {
+      margin-top: 0.5rem;
+      display: inline-block;
+      font-size: 0.9rem;
+      color: #2563eb;
+      cursor: pointer;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Blog Platform</h1>
+    <div class="nav-buttons">
+      <button onclick="location.href='register.html'">Register</button>
+      <button onclick="location.href='login.html'">Login</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="blog-list" id="blogs"></div>
+  </main>
+
+  <script>
+    async function fetchBlogs() {
+      try {
+        const res = await fetch('http://localhost:3000/blogs', {
+          credentials: 'include'
+        });
+        if (!res.ok) throw new Error("Fetch failed");
+        const blogs = await res.json();
+        renderBlogs(blogs);
+      } catch (e) {
+        alert('Could not load blogs.');
+      }
+    }
+
+    function renderBlogs(blogs) {
+      const container = document.getElementById('blogs');
+      container.innerHTML = '';
+
+      blogs.forEach(blog => {
+        const card = document.createElement('div');
+        card.className = 'blog-card';
+
+        const isLong = blog.content.length > 150;
+        const shortText = blog.content.slice(0, 150);
+        const fullText = blog.content;
+
+        card.innerHTML = `
+          <div class="blog-title">${blog.title}</div>
+          <div class="blog-author">by ${blog.author}</div>
+          <div class="blog-content" id="content-${blog.id}">${isLong ? shortText + '...' : fullText}</div>
+          ${isLong ? `<span class="more-btn" onclick="toggleContent(${blog.id}, \`${shortText}\`, \`${fullText}\`)">Show more</span>` : ''}
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function toggleContent(id, shortText, fullText) {
+      const content = document.getElementById(`content-${id}`);
+      const btn = content.nextElementSibling;
+
+      if (btn.innerText === 'Show more') {
+        content.innerText = fullText;
+        btn.innerText = 'Show less';
+      } else {
+        content.innerText = shortText + '...';
+        btn.innerText = 'Show more';
+      }
+    }
+
+    window.onload = fetchBlogs;
+  </script>
+
+</body>
+</html>
